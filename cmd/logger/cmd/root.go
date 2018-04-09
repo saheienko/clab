@@ -36,8 +36,10 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "logger",
-	Short: "Simple application that store numbers to a file",
+	Use:           "logger",
+	Short:         "Simple application that receives data and store it numbers to file",
+	SilenceErrors: true,
+	SilenceUsage:  true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		l, err := logger.New(endpoint, filePath, speed, bufferSize)
 		if err != nil {
@@ -52,6 +54,7 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
+		fmt.Printf("ERROR: logger: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -59,10 +62,10 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().Int32VarP(&speed, "flow_speed", "s", 0, "speed of the fibogen (number/s)")
+	rootCmd.PersistentFlags().Int32VarP(&speed, "flow_speed", "s", 0, "writer's speed (number/s)")
 	rootCmd.PersistentFlags().Int32VarP(&bufferSize, "buffer_size", "b", 128, "writer's buffer size")
-	rootCmd.PersistentFlags().StringVarP(&endpoint, "endpoint", "e", "", "writer's address (stdout is used by default)")
-	rootCmd.PersistentFlags().StringVarP(&filePath, "file_path", "f", "test.out", "file for storing data")
+	rootCmd.PersistentFlags().StringVarP(&endpoint, "endpoint", "e", "", "TCP server address")
+	rootCmd.PersistentFlags().StringVarP(&filePath, "file_path", "f", "logger.out", "file for storing data")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.fibogen.yaml)")
 }
 

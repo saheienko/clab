@@ -3,7 +3,6 @@ package util
 import (
 	"fmt"
 	"math"
-	"math/big"
 	"time"
 )
 
@@ -14,19 +13,16 @@ const (
 )
 
 var (
-	NumberLimit big.Int
+	ErrSpeedInvalid = fmt.Errorf("should be > 0")
+	ErrspeedLimit   = fmt.Errorf("should be less than 10^9")
 )
-
-func init() {
-	NumberLimit.Exp(big.NewInt(256), big.NewInt(16), nil)
-}
 
 func Period(speed int) (time.Duration, error) {
 	if speed <= 0 {
-		return 0, fmt.Errorf("should be > 0")
+		return 0, ErrSpeedInvalid
 	}
 	if speed > giga {
-		return 0, fmt.Errorf("should be less than 10^9")
+		return 0, ErrspeedLimit
 	}
 
 	return time.Nanosecond * time.Duration(math.Ceil(giga/float64(speed))), nil

@@ -13,17 +13,19 @@ import (
 
 const (
 	ConnTimeout = time.Second * 10
+
+	NumberDigitsLimit = 40
 )
 
 type GenNumberFunc func() *big.Int
 
 func Fibonacci() GenNumberFunc {
-	var x, y *big.Int
+	var x, y, z *big.Int
 	x, y = big.NewInt(0), big.NewInt(1)
 	return func() *big.Int {
 		defer func() {
-			x.Add(x, y)
-			x, y = y, x
+			z = big.NewInt(0)
+			x, y = y, z.Add(x, y)
 		}()
 		return x
 	}
@@ -43,7 +45,7 @@ func New(endpoint string, freq int, g GenNumberFunc) (*Generator, error) {
 
 	p, err := util.Period(freq)
 	if err != nil {
-		return nil, fmt.Errorf("convert %d frequency to period: %v", freq, err)
+		return nil, fmt.Errorf("convert %d speed to period: %v", freq, err)
 	}
 
 	return &Generator{
@@ -77,8 +79,8 @@ func (g *Generator) genNumber() (*big.Int, error) {
 	time.Sleep(g.period)
 
 	n := g.genFunc()
-	if n.Cmp(&util.NumberLimit) > 0 {
-		return nil, fmt.Errorf("got number of %d bits, limit %d", n.BitLen(), util.NumberLimit.BitLen())
+	if len(n.String()) > NumberDigitsLimit {
+		return nil, fmt.Errorf("got number that exceed digits limit (%d)", NumberDigitsLimit)
 	}
 
 	return n, nil
