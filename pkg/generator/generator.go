@@ -64,7 +64,6 @@ func (g *Generator) Run() error {
 			return fmt.Errorf("generate: %v", err)
 		}
 
-		fmt.Println("Send", n, n.BitLen())
 		// write to logger
 		_, err = g.out.Write([]byte(n.String() + string(util.Separator)))
 		if err != nil {
