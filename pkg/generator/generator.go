@@ -38,6 +38,10 @@ type Generator struct {
 }
 
 func New(endpoint string, freq int, g GenNumberFunc) (*Generator, error) {
+	if g == nil {
+		return nil, fmt.Errorf("no generation func provided")
+	}
+
 	out, err := getWriter(endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("getWriter: %v", err)

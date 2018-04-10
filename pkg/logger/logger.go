@@ -19,15 +19,13 @@ type Logger struct {
 
 	dataBuffer int
 
+	file       string
+	fileBuffer int
+
 	period time.Duration
 }
 
 func New(endpoint, file string, speed, buffSize int32) (*Logger, error) {
-	f, err := os.OpenFile(file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return nil, fmt.Errorf("open %s file: %v", file, err)
-	}
-
 	p, err := util.Period(int(speed))
 	if err != nil {
 		return nil, fmt.Errorf("convert %d speed to period: %v", speed, err)
@@ -35,13 +33,22 @@ func New(endpoint, file string, speed, buffSize int32) (*Logger, error) {
 
 	return &Logger{
 		addr:       endpoint,
-		out:        bufio.NewWriterSize(f, int(buffSize)),
+		file:       file,
+		fileBuffer: int(buffSize),
 		dataBuffer: 16,
 		period:     p,
 	}, nil
 }
 
 func (l *Logger) Run() error {
+	f, err := os.OpenFile(l.file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return fmt.Errorf("open %s file: %v", l.file, err)
+	}
+	defer f.Close()
+
+	l.out = bufio.NewWriterSize(f, l.fileBuffer)
+
 	listener, err := net.Listen("tcp", l.addr)
 	if err != nil {
 		return fmt.Errorf("endpoint %s: %v", l.addr, err)
