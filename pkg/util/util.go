@@ -14,7 +14,7 @@ const (
 
 var (
 	ErrSpeedInvalid = fmt.Errorf("should be > 0")
-	ErrspeedLimit   = fmt.Errorf("should be less than 10^9")
+	ErrSpeedLimit   = fmt.Errorf("should be less than 10^9")
 )
 
 func Period(speed int) (time.Duration, error) {
@@ -22,7 +22,7 @@ func Period(speed int) (time.Duration, error) {
 		return 0, ErrSpeedInvalid
 	}
 	if speed > giga {
-		return 0, ErrspeedLimit
+		return 0, ErrSpeedLimit
 	}
 
 	return time.Nanosecond * time.Duration(math.Ceil(giga/float64(speed))), nil

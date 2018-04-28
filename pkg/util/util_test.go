@@ -12,7 +12,7 @@ func TestPeriod(t *testing.T) {
 		err    error
 	}{
 		{speed: 0, err: ErrSpeedInvalid},            // TC#1
-		{speed: giga + 1, err: ErrspeedLimit},       // TC#2
+		{speed: giga + 1, err: ErrSpeedLimit},       // TC#2
 		{speed: 10, period: time.Millisecond * 100}, // TC#3
 	}
 
